@@ -1,8 +1,27 @@
 ---
-Data: 2022-11-3
+title: 脚本汇总
+date: 2022-11-3
 ---
 
 
+
+仓库
+
+> [脚本报错](https://lptexas.top/posts/2815769597/#%E5%AE%89%E8%A3%85kali)
+>
+> tips:如果出现`$'\r'`错误，请尝试使用vi命令编辑文件，按ESC进入命令模式，输入`: set ff=unix`。
+
+# start.sh
+
+> 用于Termux启动sshd,nginx & php-fpm,syncthing等服务。
+
+参数
+
+- help 参考详细参数
+- all 重启所有服务
+- 1 sshd
+- 2 nginx & php-fpm
+- 3 syncthing
 
 # Recovery.sh
 

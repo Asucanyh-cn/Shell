@@ -42,8 +42,11 @@ startNginx(){
 #open syncthing
 startSyncthing(){
   cmd="syncthing"
-  echo "### $cmd ###"
-  kill `ps -eo pid,cmd,user|grep syncthing|grep -v grep|awk '{print $1}'`
+  echo "### $cmd ###"  
+  pid=`ps -eo pid,cmd,user|grep syncthing|grep -v grep|awk '{print $1}'`
+  if [ -n "$pid" ];then
+    kill $pid
+  fi
   if [ "$?" -eq "0" ];then
     sleep 1
     echo "[Note] Restarting syncthing."
@@ -81,6 +84,7 @@ case $1 in
   all)
   startSshd
   startNginx
+  startPhp-fpm
   startSyncthing
     ;;
     1)
