@@ -163,12 +163,14 @@ case $1 in
   clean
   ;;
 "help")
-  echo -e "[Info]env|clean|restart\n"
+  echo -e "[Info]env|clean|start|restart\n"
   echo -e "env:Only install the necessary utils.\n"
   echo -e "clean:Only clean the *.tar.gz files.\n"
-  echo -e "restart:Reinstall nodejs and re-unzip your blog\n"
+  echo -e "start:Start recovery nomarlly."
+  echo -e "restart:Reinstall nodejs and re-unzip your blog.\n"
   ;;
 *)
   echo "[!] invalid input"
+  echo "[Note]Try 'help' for more information."
   ;;
 esac
