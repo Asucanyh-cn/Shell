@@ -2,3 +2,4 @@ export USER=root
 export HOME=/root
 
 vncserver -geometry 1280x800 -depth 24 -name remote-desktop :2
+pulseaudio --start
