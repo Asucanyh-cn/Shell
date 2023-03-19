@@ -14,7 +14,7 @@ dataFile='blog-source.zip' #可定义数据文件名
 nodeVersion="v16.16.0"
 nodeurl="https://nodejs.org/dist/$nodeVersion/node-$nodeVersion-linux-$arch.tar.xz" #自动检查
 ####用于git配置
-email=asucanyh-cn@outlook.com
+email=asucanyh@outlook.com
 username=asucanyh-cn
 remoteRepo=blog-source
 ####
