@@ -6,8 +6,7 @@
 #    2.准备好从github中下载的源码(.zip)，或者直接git clone(推荐)
 #    3.准备脚本r.sh，赋予可执行权限，注意修改nodejs的版本
 #    4.执行./r.sh start <指定压缩文件>，
-#    4.
-#    1.
+#    5. 
 ####
 blog="myblog"              #博客数据包解压后的文件夹名
 currentPath=$PWD           #博客所在目录
@@ -27,13 +26,14 @@ function checkParams() {
       exit 17
     fi
     dataFile=$2
-    if [ "${dataFile:0-3}" != ".gz" -o "${dataFile:0-3}" != "zip" ]; then
+    if [ "${dataFile:0-3}" == ".gz" -o "${dataFile:0-3}" == "zip" ]; then
+      if [ $# -eq 1 -a $1 == "start" ]; then
+        echo -e "[Note]You are running without datafile,you'd better specify it!"
+      fi
+    else
       echo "[Error]Wrong compressed file.Please check your param!"
       exit 32
     fi
-  fi
-  if [ $# -eq 1 -a $1 == "start" ]; then
-    echo -e "[Note]You are running without datafile,you'd better specify it!"
   fi
   echo "[Info]Parameters checked."
 }
@@ -182,7 +182,7 @@ function gitConfig() {
 }
 function repairNPM() {
   cd $blog
-  echo -e "[Info]Repairing the errors."
+  echo -e "[Info]Repairing the errors,it may take a long time,please be patient!"
   rm -rf node_modules && nohup npm install --force &>/dev/null
   rm -rf .deploy_git/
   # git config --global core.autocrlf false
