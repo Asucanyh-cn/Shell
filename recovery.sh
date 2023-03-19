@@ -6,7 +6,7 @@
 #    2.准备好从github中下载的源码(.zip)，或者直接git clone(推荐)
 #    3.准备脚本r.sh，赋予可执行权限，注意修改nodejs的版本
 #    4.执行./r.sh start <指定压缩文件>，
-#    5. 
+#    5.
 ####
 blog="myblog"              #博客数据包解压后的文件夹名
 currentPath=$PWD           #博客所在目录
@@ -26,8 +26,10 @@ function checkParams() {
       exit 17
     fi
     dataFile=$2
-    if [ "${dataFile:0-3}" == ".gz" -o "${dataFile:0-3}" == "zip" ]; then
+    if [ ${dataFile:0-3} == ".gz" -o ${dataFile:0-3} == "zip" ]; then
       if [ $# -eq 1 -a $1 == "start" ]; then
+        echo -e "[Note]You are running without datafile,you'd better specify it!"
+      elif [ $# -eq 1 -a $1 == "restart" ]; then
         echo -e "[Note]You are running without datafile,you'd better specify it!"
       fi
     else
@@ -37,9 +39,9 @@ function checkParams() {
   fi
   echo "[Info]Parameters checked."
 }
-function restart() {
-  echo -e "\n[Info]Cleaning nodejs & $blog..."
-  nohup rm -rf $currentPath/nodejs &>/dev/null
+function cleanFiles() {
+  echo -e "[Info]Cleaning nodejs & $blog..."
+  nohup rm -rf /usr/local/nodejs &>/dev/null
   nohup rm -rf $currentPath/$blog &>/dev/null
   sleep 1
 }
@@ -144,30 +146,35 @@ function env() {
   ln -s /usr/local/nodejs/lib/node_modules/hexo-cli/bin/hexo /usr/local/bin/hexo
 }
 function unzip() {
-  if [ "$#" -eq 1 ]; then
+  if [ $# -eq 1 ]; then
     echo -e "[Note]Please specify the datafile."
     exit 25
   fi
+  echo -e "[Note]Starting unpack $2."
   ## 还原数据
   ### 解压数据包 并修改文件夹为$blog
   if [ ! -d "$currentPath/$blog" ]; then
     if [ "${dataFile:0-3}" == ".gz" ]; then
       tar -xf $currentPath/$dataFile
-      if [ "$?" -eq 0 ]; then
+      if [ $? -eq 0 ]; then
         mv $currentPath/${dataFile%*.tar.gz} $currentPath/$blog
       fi
-    elif [ ${dataFile:0-3} == 'zip' ]; then
+    elif [ ${dataFile:0-3} == "zip" ]; then
       nohup $pkgm install zip -y &>/dev/null
       nohup unzip $currentPath/$dataFile &>/dev/null
-      if [ "$?" -eq 0 ]; then
+      if [ $? -eq 0 ]; then
         mv $currentPath/${dataFile%*.zip} $currentPath/$blog
       fi
     fi
   fi
   if [ -d $currentPath/$blog ]; then
+    echo -e "[Info]Unpack done."
     echo -e "[Info]Now,you can switch to '$blog' and use 'hexo server' to preview your site!\n[Note]Done"
   else
     if [ "$1" == "start" -a ! "$#" -eq 1 ]; then
+      echo -e "\n[Error]Please check 'tar -xf $dataFile or 'unzip $dataFile.'\n"
+      exit 80
+    elif [ "$1" == "restart" -a ! "$#" -eq 1 ]; then
       echo -e "\n[Error]Please check 'tar -xf $dataFile or 'unzip $dataFile.'\n"
       exit 80
     fi
@@ -214,9 +221,9 @@ case $1 in
   ;;
 "restart")
   checkOS
+  cleanFiles
   env
   gitConfig
-  restart
   unzip $1 $2
   ;;
 "unzip")
@@ -228,6 +235,10 @@ case $1 in
 "init")
   initGit
   ;;
+  "ri")
+  repairNPM
+  initGit
+  ;;
 "clean")
   clean
   ;;
@@ -236,6 +247,7 @@ case $1 in
   echo -e "    env:     Only install the necessary utils."
   echo -e "    repair:  Repair npm module errors."
   echo -e "    init:    Link the remote reposity with local reposity."
+  echo -e "    ri:      Repair and init."
   echo -e "    unzip:   Only unpack the datafile."
   echo -e "    clean:   Clean the necessary files."
   echo -e "    start:   Start recovery nomarlly."
