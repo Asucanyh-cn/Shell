@@ -1,28 +1,41 @@
 #!/bin/bash
 #一键部署Hexo环境以及恢复Blog数据
-####使用步骤
-#修改currentPath变量为你想要恢复到的目录下
-#放置`博客备份文件`至currentPath目录下（可以是git clone的文件夹，也可以是下载的压缩包）
-#设置`博客备份文件`的文件名称
-#运行脚本 脚本可以使用两个参数，一个是restart
 ####
-blog="myblog"                                                             #博客数据包解压后的文件夹名
-currentPath=$PWD                                                          #博客所在目录
-dataFile='blog-source.zip'                                                #可定义数据文件名
-nodeurl="https://nodejs.org/dist/v16.16.0/node-v16.16.0-linux-x64.tar.xz" # nodejs版本链接（可自定义）
+#    使用步骤
+#    1.cd切换至需要恢复到的目录下
+#    2.准备好从github中下载的源码(.zip)，或者直接git clone(推荐)
+#    3.准备脚本r.sh，赋予可执行权限，注意修改nodejs的版本
+#    4.执行./r.sh start <指定压缩文件>，
+#    4.
+#    1.
+####
+blog="myblog"              #博客数据包解压后的文件夹名
+currentPath=$PWD           #博客所在目录
+dataFile='blog-source.zip' #可定义数据文件名
+nodeVersion="v16.16.0"
+nodeurl="https://nodejs.org/dist/$nodeVersion/node-$nodeVersion-linux-$arch.tar.xz" #自动检查
 ####用于git配置
 email=asucanyh-cn@outlook.com
 username=asucanyh-cn
 remoteRepo=blog-source
 ####
 function checkParams() {
-  if [ "$#" -eq 2 ]; then
-    if [ "${#2}" -lt 3 ]; then
-      echo -e "[Error]Please check your parameter for dataFile!\n"
+  echo "[Info]Checking parameters..."
+  if [ $# -eq 2 ]; then
+    if [ ${#2} -lt 3 ]; then
+      echo "[Error]Please check your parameter for dataFile!"
       exit 17
     fi
     dataFile=$2
+    if [ "${dataFile:0-3}" != ".gz" -o "${dataFile:0-3}" != "zip" ]; then
+      echo "[Error]Wrong compressed file.Please check your param!"
+      exit 32
+    fi
   fi
+  if [ $# -eq 1 -a $1 == "start" ]; then
+    echo -e "[Note]You are running without datafile,you'd better specify it!"
+  fi
+  echo "[Info]Parameters checked."
 }
 function restart() {
   echo -e "\n[Info]Cleaning nodejs & $blog..."
@@ -52,8 +65,8 @@ function clean() {
 
 }
 function checkOS() {
-  ####检查当前操作系统
-  echo -e "Recovery starting..."
+  ####检查发行版本
+  echo -e "[Note]Recovery starting..."
   OS=$(cat /etc/os-release | grep ^NAME=".*" | awk -F "\"" '{print $2}')
   if [ "$OS" == "CentOS Linux" -o "$OS" == "CentOS" ]; then
     pkgm="yum"
@@ -61,6 +74,12 @@ function checkOS() {
     pkgm="apt-get"
   fi
   nohup sudo $pkgm update -y --skip-broken &>/dev/null
+  #####检查架构
+  if [ "$(dpkg --print-architecture)" == "arm64" ]; then
+    arch="arm64"
+  else
+    arch="x64"
+  fi
 }
 function env() {
   ## 安装git
@@ -148,8 +167,10 @@ function unzip() {
   if [ -d $currentPath/$blog ]; then
     echo -e "[Info]Now,you can switch to '$blog' and use 'hexo server' to preview your site!\n[Note]Done"
   else
-    echo -e "\n[Error]Please check 'tar -xf $dataFile or 'unzip $dataFile.'\n"
-    exit 80
+    if [ "$1" == "start" -a ! "$#" -eq 1 ]; then
+      echo -e "\n[Error]Please check 'tar -xf $dataFile or 'unzip $dataFile.'\n"
+      exit 80
+    fi
   fi
 }
 function gitConfig() {
@@ -179,25 +200,24 @@ function initGit() {
 }
 
 ##main
-checkParams
+checkParams $1 $2
 case $1 in
 "start")
   checkOS
   env
   gitConfig
-  unzip
+  unzip $1 $2
   ;;
 "env")
   checkOS
   env
-  gitConfig
   ;;
 "restart")
   checkOS
   env
   gitConfig
   restart
-  unzip
+  unzip $1 $2
   ;;
 "unzip")
   unzip
