@@ -243,6 +243,7 @@ case $1 in
   ;;
 *)
   echo "[!] invalid input"
+  echo "[Note]Use option: 'start' to began recovery."
   echo "[Note]Try 'help' for more information."
   ;;
 esac
