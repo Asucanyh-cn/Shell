@@ -10,6 +10,9 @@ blog="myblog"                                                             #博�
 currentPath=$PWD                                                          #博客所在目录
 dataFile='*.zip'                                                          #可定义数据文件名
 nodeurl="https://nodejs.org/dist/v16.16.0/node-v16.16.0-linux-x64.tar.xz" # nodejs版本链接（可自定义）
+####用于git配置
+email=asucanyh-cn@outlook.com
+username=asucanyh-cn
 ####
 if [ "$#" -eq 2 ]; then
   if [ "${#2}" -lt 3 ]; then
@@ -143,19 +146,37 @@ function unzip() {
     # exit 80
   fi
 }
+function gitConfig(){
+  git config --global user.email "$email"
+  git config --global user.name "$username"
+  git config --global credential.helper store
+  git config --global http.sslVerify false
+  git config --global init.defaultBranch main
+}
+function repairNPM(){
+  cd $myblog
+  rm -rf node_modules && npm install --force
+  npm audit fix --force
+  cd ../
+}
 case $1 in
 "start")
   checkOS
   env
+  gitConfig
+  repairNPM
   unzip
   ;;
 "env")
   checkOS
   env
+  gitConfig
+  repairNPM
   ;;
 "restart")
   checkOS
   env
+  gitConfig
   restart
   unzip
   ;;
