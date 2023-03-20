@@ -5,8 +5,9 @@
 #    1.cd切换至需要恢复到的目录下
 #    2.准备好从github中下载的源码(.zip)，或者直接git clone(推荐)
 #    3.准备脚本r.sh，赋予可执行权限，注意修改nodejs的版本
-#    4.执行./r.sh start <指定压缩文件>，
-#    5.
+#    4.执行./r.sh start <指定压缩文件>，不指定时只配置基本环境
+#    5.将远程仓库的私钥放置.ssh目录下，确保权限为600，且密钥能被识别。
+#    6.执行./r.sh ri 修复npm module 以及对接远程仓库
 ####
 blog="myblog"              #博客数据包解压后的文件夹名
 currentPath=$PWD           #博客所在目录
@@ -18,26 +19,26 @@ email=asucanyh@outlook.com
 username=asucanyh-cn
 remoteRepo=blog-source
 ####
-function checkParams() {
-  echo "[Info]Checking parameters..."
+function checkFileName() {
   if [ $# -eq 2 ]; then
+    echo "[Info]Checking filename..."
     if [ ${#2} -lt 3 ]; then
-      echo "[Error]Please check your parameter for dataFile!"
+      echo "[Error]Please check your name of data file!"
       exit 17
     fi
     dataFile=$2
     if [ ${dataFile:0-3} == ".gz" -o ${dataFile:0-3} == "zip" ]; then
       if [ $# -eq 1 -a $1 == "start" ]; then
-        echo -e "[Note]You are running without datafile,you'd better specify it!"
+        echo -e "[Note]You are running without data file,you'd better specify it!"
       elif [ $# -eq 1 -a $1 == "restart" ]; then
-        echo -e "[Note]You are running without datafile,you'd better specify it!"
+        echo -e "[Note]You are running without data file,you'd better specify it!"
       fi
     else
-      echo "[Error]Wrong compressed file.Please check your param!"
+      echo "[Error]Wrong type of compressed file.Please check your file name parameter!"
       exit 32
     fi
+    echo "[Info]$dataFile passed."
   fi
-  echo "[Info]Parameters checked."
 }
 function cleanFiles() {
   echo -e "[Info]Cleaning nodejs & $blog..."
@@ -207,7 +208,7 @@ function initGit() {
 }
 
 ##main
-checkParams $1 $2
+checkFileName $1 $2
 case $1 in
 "start")
   checkOS
