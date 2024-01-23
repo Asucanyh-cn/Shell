@@ -12,7 +12,8 @@
 blog="myblog"              #博客数据包解压后的文件夹名
 currentPath=$PWD           #博客所在目录
 dataFile='blog-source.zip' #可定义数据文件名
-nodeVersion="v16.16.0"
+nodeVersion="v16.16.0"     #默认node版本
+arm="arm4"                 #默认系统架构
 nodeurl="https://nodejs.org/dist/$nodeVersion/node-$nodeVersion-linux-$arch.tar.xz" #自动检查
 ####用于git配置
 email=asucanyh@outlook.com
