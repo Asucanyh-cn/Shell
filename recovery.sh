@@ -3,8 +3,7 @@
 blog="myblog"              #博客数据包解压后的文件夹名
 currentPath=$PWD           #博客所在目录
 dataFile='blog-source.zip' #可定义数据文件名
-#nodeVersion="v16.16.0"
-nodeVersion="v18.17.0"
+nodeVersion="v16.15.0"
 arch='arm64'
 ####Git配置
 email=asucanyh@outlook.com
