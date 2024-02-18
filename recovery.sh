@@ -1,12 +1,4 @@
 #!/bin/bash
-####
-#    使用步骤
-#    1.cd切换至需要恢复到的目录下
-#    2.准备好从github中下载的源码(.zip)，或者直接git clone(推荐-此方法需要手动修改文件夹名为$blog)
-#    3.准备脚本r.sh，赋予可执行权限，注意修改nodejs的版本
-#    4.执行./r.sh start <指定压缩文件>，
-####
-
 ####基础配置
 blog="myblog"              #博客数据包解压后的文件夹名
 currentPath=$PWD           #博客所在目录
@@ -258,7 +250,8 @@ case $1 in
      1.cd切换至需要恢复到的目录下
      2.准备好从github中下载的源码(.zip)，或者直接git clone(推荐-此方法需要手动修改文件夹名为$blog)
      3.准备脚本r.sh，赋予可执行权限，注意修改nodejs的版本
-     4.执行./r.sh start <指定压缩文件>，
+     4.执行./r.sh start <指定压缩文件|clone文件无需指定>
+     5.安装Github密钥文件/root/.ssh/id_rsa（备份在Onedrive/keys/hexo_git_id_rsa）
  "
   echo -e "Usage: <Command> [OPTION] [FILE]"
   echo -e "    env:     Only install the necessary utils."
