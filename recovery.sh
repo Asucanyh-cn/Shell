@@ -1,5 +1,4 @@
 #!/bin/bash
-#一键部署Hexo环境以及恢复Blog数据
 ####
 #    使用步骤
 #    1.cd切换至需要恢复到的目录下
@@ -7,16 +6,19 @@
 #    3.准备脚本r.sh，赋予可执行权限，注意修改nodejs的版本
 #    4.执行./r.sh start <指定压缩文件>，
 ####
+
+####基础配置
 blog="myblog"              #博客数据包解压后的文件夹名
 currentPath=$PWD           #博客所在目录
 dataFile='blog-source.zip' #可定义数据文件名
 nodeVersion="v16.16.0"
-nodeurl="https://nodejs.org/dist/$nodeVersion/node-$nodeVersion-linux-$arch.tar.xz" #自动检查
-####用于git配置
+arch='arm64'
+####Git配置
 email=asucanyh@outlook.com
 username=asucanyh-cn
 remoteRepo=blog-source
-####
+####Nginx配置
+
 function checkFileName() {
   if [ $# -eq 2 ]; then
     echo "[Info]Checking filename..."
@@ -38,6 +40,7 @@ function checkFileName() {
     echo "[Info]$dataFile passed."
   fi
 }
+
 function cleanFiles() {
   echo -e "[Info]Cleaning nodejs & $blog..."
   nohup rm -rf /usr/local/nodejs &>/dev/null
@@ -46,10 +49,10 @@ function cleanFiles() {
 }
 function clean() {
   #清除所有无用的文件
-  echo "Cleaning Starting..."
-  if [ ! -e $currentPath/nodejs.tar.xz -a ! -e $currentPath/$dataFile ]; then
-    echo "[Note]Files not exist."
-  fi
+  echo "[Note]Cleaning Starting..."
+#  if [ ! -e $currentPath/nodejs.tar.xz -a ! -e $currentPath/$dataFile ]; then
+#   echo "[Note]Files not exist."
+#  fi
   if [ -e $currentPath/nodejs.tar.xz -a -e $currentPath/$dataFile ]; then
     nohup rm -f $currentPath/nodejs.tar.xz &>/dev/null
     nohup rm -f $currentPath/$dataFile &>/dev/null
@@ -63,7 +66,7 @@ function clean() {
     nohup rm -f $currentPath/$dataFile &>/dev/null
     echo -e "[Info]$dataFile was cleaned."
   fi
-
+  echo "[Note]Cleaning finished"
 }
 function checkOS() {
   ####检查发行版本
@@ -82,6 +85,7 @@ function checkOS() {
     arch="x64"
   fi
 }
+
 function env() {
   ## 安装git
   nohup $pkgm install -y git &>/dev/null
@@ -89,7 +93,7 @@ function env() {
     echo -e "[Info]'git' installed successfully!"
   else
     echo -e "\n[Error]Please check 'git'\n"
-    exit 19
+    exit 96
   fi
 
   ## 安装wget
@@ -98,20 +102,19 @@ function env() {
     echo -e "[Info]'wget' installed successfully!"
   else
     echo -e "\n[Error]Please check 'wget'\n"
-    exit 28
+    exit 105
   fi
+  ## 安装nodejs
   if [ ! -e "nodejs" -a ! -e "nodejs.tar.xz" ]; then
-    wget $nodeurl -O nodejs.tar.xz
+    wget "https://nodejs.org/dist/$nodeVersion/node-$nodeVersion-linux-$arch.tar.xz" -O nodejs.tar.xz
   fi
   if [ ! -e "nodejs" -a -e "nodejs.tar.xz" ]; then
     tar -xf $currentPath/nodejs.tar.xz
     mv $(find $currentPath -name node-v[0-9]*) $currentPath/nodejs
   fi
-  # 重新创建nodejs软链接
-  ###
+  ### 重新创建nodejs软链接
   rm -rf /usr/local/nodejs
   mv $currentPath/nodejs /usr/local
-  ###
   rm -f /usr/local/bin/node
   ln -s /usr/local/nodejs/bin/node /usr/local/bin/node
   rm -f /usr/local/bin/npm
@@ -123,9 +126,9 @@ function env() {
     echo -e "[Info]'nodejs' installed successfully!"
   else
     echo -e "\n[Error]Please check 'nodejs'\n"
-    exit 44
+    exit 129
   fi
-  ## npm
+  ## 安装npm
   if [ "$?" -eq 0 ]; then
     nohup npm -v &>/dev/null
   fi
@@ -133,7 +136,7 @@ function env() {
     echo -e "[Info]'npm' installed successfully!"
   else
     echo -e "\n[Error]Please check 'npm'\n"
-    exit 57
+    exit 139
   fi
   ## 安装Hexo
   nohup hexo &>/dev/null
@@ -143,11 +146,19 @@ function env() {
   ### 链接hexo命令至环境变量中
   rm -f /usr/local/bin/hexo
   ln -s /usr/local/nodejs/lib/node_modules/hexo-cli/bin/hexo /usr/local/bin/hexo
+  ## 安装nginx
+  nohup $pkgm install -y nginx &>/dev/null
+  if [ "$?" -eq 0 ]; then
+    echo -e "[Info]'nginx' installed successfully!"
+  else
+    echo -e "\n[Error]Please check 'nginx'\n"
+    exit 155
+  fi
 }
 function unzip() {
   if [ $# -eq 1 ]; then
     echo -e "[Note]Please specify the datafile."
-    exit 25
+    exit 161
   fi
   echo -e "[Note]Starting unpack $2."
   ## 还原数据
@@ -175,7 +186,7 @@ function unzip() {
       exit 80
     elif [ "$1" == "restart" -a ! "$#" -eq 1 ]; then
       echo -e "\n[Error]Please check 'tar -xf $dataFile or 'unzip $dataFile.'\n"
-      exit 80
+      exit 189
     fi
   fi
 }
@@ -242,9 +253,8 @@ case $1 in
   clean
   ;;
 "help")
- echo -e "
- 一键部署Hexo环境以及恢复Blog数据
- 使用步骤:
+ echo -e "一键部署Hexo环境以及恢复Blog数据
+使用步骤:
      1.cd切换至需要恢复到的目录下
      2.准备好从github中下载的源码(.zip)，或者直接git clone(推荐-此方法需要手动修改文件夹名为$blog)
      3.准备脚本r.sh，赋予可执行权限，注意修改nodejs的版本
@@ -266,4 +276,3 @@ case $1 in
   echo "[Note]Try 'help' for more information."
   ;;
 esac
-
