@@ -3,17 +3,14 @@
 ####
 #    使用步骤
 #    1.cd切换至需要恢复到的目录下
-#    2.准备好从github中下载的源码(.zip)，或者直接git clone(推荐)
+#    2.准备好从github中下载的源码(.zip)，或者直接git clone(推荐-此方法需要手动修改文件夹名为$blog)
 #    3.准备脚本r.sh，赋予可执行权限，注意修改nodejs的版本
-#    4.执行./r.sh start <指定压缩文件>，不指定时只配置基本环境
-#    5.将远程仓库的私钥放置.ssh目录下，确保权限为600，且密钥能被识别。
-#    6.执行./r.sh ri 修复npm module 以及对接远程仓库
+#    4.执行./r.sh start <指定压缩文件>，
 ####
 blog="myblog"              #博客数据包解压后的文件夹名
 currentPath=$PWD           #博客所在目录
 dataFile='blog-source.zip' #可定义数据文件名
-nodeVersion="v16.16.0"     #默认node版本
-arm="arm4"                 #默认系统架构
+nodeVersion="v16.16.0"
 nodeurl="https://nodejs.org/dist/$nodeVersion/node-$nodeVersion-linux-$arch.tar.xz" #自动检查
 ####用于git配置
 email=asucanyh@outlook.com
@@ -245,6 +242,14 @@ case $1 in
   clean
   ;;
 "help")
+ echo -e "
+ 一键部署Hexo环境以及恢复Blog数据
+ 使用步骤:
+     1.cd切换至需要恢复到的目录下
+     2.准备好从github中下载的源码(.zip)，或者直接git clone(推荐-此方法需要手动修改文件夹名为$blog)
+     3.准备脚本r.sh，赋予可执行权限，注意修改nodejs的版本
+     4.执行./r.sh start <指定压缩文件>，
+ "
   echo -e "Usage: <Command> [OPTION] [FILE]"
   echo -e "    env:     Only install the necessary utils."
   echo -e "    repair:  Repair npm module errors."
@@ -261,3 +266,4 @@ case $1 in
   echo "[Note]Try 'help' for more information."
   ;;
 esac
+
